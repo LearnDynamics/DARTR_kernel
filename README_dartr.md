@@ -18,3 +18,11 @@ Examples include
 
 - start from [run_demo.m], change the settings there
 - The current code is only for vector estimator: viewing the kernel as a vector on the grid points. Code for estimator on basis functions available at request.  
+
+### General Applications: solving least squares |Ax-b|^2 with basis matrix B
+DARTR works for general nonparametric regression problem with any basis functions. It solves the least squares with Tikhonov regularization
+$$|Ax-b|^2  + \lambda \|x\|_{B_{rkhs}}^2. $$
+
+- The reguarlization package is folder [regularization]. It requires the basis matrix $B =\langle \phi_i,\phi_j\rangle _{L^2(\rho)}$.    
+- It selects the optimal hyper-parameter $\lambda$ by the L-curve method.
+- The core function is [Lcurve_sidaRKHS_lsq2.m]
