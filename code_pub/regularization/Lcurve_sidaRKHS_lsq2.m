@@ -11,12 +11,17 @@ B_rkhs     = pinv(V*diag(real(eigL))*V');   % pinv(Abar);  B_rkhs= inv(Abar) whe
 % [U,S] = eig(B_rkhs); sqrtBinv = U*pinv(sqrtm(real(S)))*U'; 
 >>> sqrtBinv = V*diag(sqrt(real(eigL)))*V'
 %}
+
 [V, eigL]  = eig(A,Bmat);  % generalized eigenvalue   A V = B*V*eigL; V'*B*V =I;  V'*A*V = eigL; >>>  B_rkhs = inv(V*diag(eigL)*V')
 eigL       = real(diag(eigL));  [~,ind] = sort(eigL,'descend'); % V'*A*V = eigL; V'*B*V =I;
 eigL       = eigL(ind); V = V(:,ind);
+tol  = 1e-20; 
+eigL(eigL<tol)  = tol;   % if eigL < 1e-20, set it to be 1e-20; 
+
 % B_rkhs = inv(V*diag(eigL)*V'); 
 sqrtBinv = sqrtm(V*diag(real(eigL))*V'); 
- 
+sqrtBinv = real(sqrtBinv);
+
 %% === the rest are the same as 
 b1       = sqrtBinv'*b;
 A1       = sqrtBinv'*A * sqrtBinv; 
@@ -57,7 +62,7 @@ switch curvatureType
         lambda_opt = opt_lambda_curvature(E,R, lambda_seq, plotON);
 end
 
- if lambda_opt<1e-12 || lambda_opt>0.5
+ if lambda_opt<1e-12 || lambda_opt>1.5
     lambda_opt = Opt_lambda_curvature3pt(E,R, lambda_seq, plotON,titl);
  end
    
@@ -65,7 +70,7 @@ end
 % if rank(A1) < length(A1(1,:)) && lambda_opt< min(eigL)
 %    x_pinv = sqrtBinv*pinv(A1+lambda_opt*eye(n)) * b1; % lsqminnorm(A+lambda_opt*B, b);    % % >>> > lsqminnorm and pinv are similar here bc. A+lambda_opt*B is well-conditioned.
 %    x_reg  = x_pinv; 
-% else
+% elses
     x_lsq  = sqrtBinv*lsqminnorm(A1+lambda_opt*eye(n), b1);
     x_reg  = x_lsq;
 % end
