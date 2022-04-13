@@ -1,8 +1,6 @@
 # DARTR_kernel
 Data Adaptive RKHS Tikhonov Regularization for learning kernels in operators
 
-![Visitor Count](https://profile-counter.glitch.me/{YOUR USER}/count.svg)
-
 ### Problem Statement:
 We fit to the function data $(u_i,f_i)$ an operator $R_\phi[u_i] = f_i$, where  
     $$ R_\phi[u](x) = \int \phi(|y|)g[u](x,x+y) dy 
