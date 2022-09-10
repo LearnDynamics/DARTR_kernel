@@ -1,6 +1,6 @@
 function [x_reg,lambda_opt] = Lcurve_sidaRKHS_lsq2(A,b,Bmat,titl,plotON)
 % L-curve regularization with RKHS using lsqminnorm minimizing rkhs-norm,
-% but without computing Brkhs using inversion (Lcurve_with_Norm_lsq2.m)
+% but without computing Brkhs, which involves inversion of singular/ill-conditioned matrices (Lcurve_with_Norm_lsq2.m)
 
 %{
 [V, eigL]  = eig(Abar,Bmat);  % generalized eigenvalue   A = B*V*eigL; V'*B*V =I;  V'*A*V = eigL; >>>  B_rkhs = inv(V*diag(eigL)*V')
@@ -26,7 +26,9 @@ sqrtBinv = real(sqrtBinv);
 b1       = sqrtBinv'*b;
 A1       = sqrtBinv'*A * sqrtBinv; 
 n = length(b1);
-%% Quanjun's treatment for lambda range and LossFn (so that the Lcurve to work the best) 
+%% Treatment for lambda range and LossFn: so that the Lcurve to work the best
+%   1. lambda  in a range depending on the eigenvalues
+%   2. compute Loss using norm(sqrt(A)x-sqrt(A)\b), to avoid estimating const 
 % Some observations:
 % 1. c'Ac - 2b'c + b'A^-1b = (Ac - b)'A^-1(Ac-b)
 % 2. (A + lambda B)c = b  ====> Ac-b = -lambda * B * c
@@ -50,9 +52,10 @@ for ll = 1:len
     E(ll) = norm(A2*x_l - b2); %This is the best method
     R(ll) = x_rkhs'*x_rkhs;
 end
+R  = sqrt(R); 
 
 %% L-curve
-if ~exist('curvatureType','var');  curvatureType = 'fit_curve'; end
+if ~exist('curvatureType','var');  curvatureType = '3ptCircle'; end
 switch curvatureType
     case 'fit_curve'
         lambda_opt = Opt_lambda_Quanjun(E, R, lambda_seq, plotON, titl);

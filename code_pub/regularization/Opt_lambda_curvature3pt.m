@@ -3,25 +3,28 @@ function [lambda] = Opt_lambda_curvature3pt(zeta,ita,all_lambda,plotON,titl)
 zeta   = log10(zeta)/2;
 ita   = log10(ita)/2;
 
-X = [zeta, ita];
+ind_loss = find(zeta>-20); 
+ind_norm = find(ita(ind_loss)>-20); 
+zeta1    = zeta(ind_loss);  zeta1 = zeta1(ind_norm); 
+ita1     = ita(ind_loss);   ita1  = ita1(ind_norm); 
+all_lambda = all_lambda(ind_loss); all_lambda = all_lambda(ind_norm); 
+
+X = [zeta1, ita1];
 [~,R2,K2] = curvature3pt(X);      % using 3-point circle radium for curvature 
 sgn = -1 + 2 * (K2(:,1)>0).*(K2(:,2)>0);
 
 [val, ind] = max(1./R2.*sgn);
 lambda = all_lambda(ind);
 
+
 if plotON
     figure;h_fig = subplot(121);
-    h = plot(zeta,ita, '-o', 'LineWidth',2); grid on; 
-%     axis equal;    %set(h,'marker','.');
-    ylabel log_{10}(||x||_{B});  xlabel log_{10}(||Ax-b||);    title('2D curve with curvature vectors');   
-%     hold on; quiver(zeta,ita,K2(:,1),K2(:,2),'LineWidth',1);   hold off
-%     ylim([min(ita), max(ita)])
-%     xlim([min(zeta), max(zeta)])
+    h = plot(zeta1,ita1, '-o', 'LineWidth',2); grid on; axis equal;    %set(h,'marker','.');
+    ylabel log_{10}(||x||_{B});  xlabel log_{10}(||Ax-b||);    title('2D curve with curvature vectors');   hold on
+    quiver(zeta1,ita1,K2(:,1),K2(:,2),'LineWidth',1);   hold off
     if nargin<5; titl = 'L-curve and normal vector'; end 
     title(titl);
-%     legend('L-curve','normal vector')
-    legend('L-curve');
+    legend('L-curve','normal vector')
     sgn = -1 + 2 * (K2(:,1)>0).*(K2(:,2)>0);
 
    %  set(h_fig, 'position', [0.13 0.1 0.3 0.8] ); set(gca,'FontSize',15 );
@@ -37,21 +40,4 @@ if plotON
     % fig = gcf;    fig.Units = 'inches';     fig.Position = [2 2   14 12];
     
 end
-
-
-%%
-% figure;
-% AxesH = axes;
-% set(AxesH, 'Units', 'pixels', 'Position', [30, 30, 500, 500]);
-% 
-% h = plot(zeta,ita, '-o', 'LineWidth',2); grid on; 
-% % axis equal;    %set(h,'marker','.');
-% ylabel log_{10}(||x||_{B});  xlabel log_{10}(||Ax-b||);    title('2D curve with curvature vectors');
-% ylim([min(ita), max(ita)])
-% xlim([min(zeta), max(zeta)])
-% title(titl);
-% legend('L-curve','normal vector')
-% sgn = -1 + 2 * (K2(:,1)>0).*(K2(:,2)>0);
-
-
 end

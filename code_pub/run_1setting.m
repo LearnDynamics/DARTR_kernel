@@ -41,5 +41,5 @@ normType = {'l2','L2','RKHS'};   % ,'H1' to compare H1, otherRKHS?
 %% vector estimator: value of the kernel on meshes
  [Est_vector] = vector_kernel_run2(kernelInfo, regressionData, SAVE_DIR, plotOn,saveON,Bmat_type,normType,plot4paper);
 
-%% 3. function estimator: with basis functions. 
+%% 3. function estimator: with basis functions -- they have regularization effects that would mix with DARTR. Thus, not tested here. 
 

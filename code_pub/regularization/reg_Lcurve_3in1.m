@@ -2,7 +2,7 @@ function [x_reg,lambda_opt,cLcurveAll] = reg_Lcurve_3in1(Abar,bbar,B,plotON, nor
 % regularizaiton using L-curve to select optimal lambda, considering three norms: l2, L2, L2-RKHS
 % NOTE: L-curve RKHS may need a different range for the parameter.
 %{
-normType  = {'l2','L2','rkhs'} or part of them
+normType  = {'l2','L2','rkhs'} or part of them; other types are possible. 
                   x_l = argmin_x  |Ax -b|^2 + lambda x'*B*x
                       = (A'*A+lambda*B)\(A'*b)
  Set lambda to damp the error in A\b while keeping the norm x'*B*x small
@@ -44,12 +44,15 @@ for nn = 1:length(normType)
             %             cLcurveAll.inds_lambda_L2      = find(eigL>lambda_opt);
         case 'RKHS'   %% 3. Lcurve-rkhs regulariztion, norm_type = 'rkhs'
             titl      = ['L-curve with norm: ',norm_type];
-%             [V, eigL]  = eig(Abar,Bmat);  % generalized eigenvalue   A = B*V*eigL; V'*B*V =I;  V'*A*V = eigL; >>>  B_rkhs = inv(V*diag(eigL)*V')
-%             eigL       = real(diag(eigL));  [~,ind] = sort(eigL,'descend');
-%             eigL       = eigL(ind); V = V(:,ind);
-%             B_rkhs     = pinv(V*diag(real(eigL))*V');   % pinv(Abar);  B_rkhs= inv(Abar) when Bmat=Id;
-%             [x_reg,lambda_opt] = Lcurve_with_Norm_pinv(Abar,bbar,B_rkhs,titl,plotON);             
-            [x_reg,lambda_opt] = Lcurve_sidaRKHS_lsq2(Abar,bbar,Bmat,titl,plotON);
+            if 0  % to do: reduce numerical error in B_rkhs
+                [V, eigL]  = eig(Abar,Bmat);  % generalized eigenvalue   A = B*V*eigL; V'*B*V =I;  V'*A*V = eigL; >>>  B_rkhs = inv(V*diag(eigL)*V')
+                eigL       = real(diag(eigL));  [~,ind] = sort(eigL,'descend');
+                eigL       = eigL(ind); V = V(:,ind);
+                B_rkhs     = pinv(V*diag(real(eigL))*V');   % = pinv(Abar);  B_rkhs= inv(Abar) when Bmat=Id;
+                [x_reg,lambda_opt] = Lcurve_with_Norm_pinv(Abar,bbar,B_rkhs,titl,plotON);
+            else  % use lsq to sovlve x_lambda
+                [x_reg,lambda_opt] = Lcurve_sidaRKHS_lsq2(Abar,bbar,B,titl,plotON);
+            end
             
             cLcurveAll.creg_RKHS             = x_reg;
             cLcurveAll.creg_RKHS_lambda_opt  = lambda_opt;
